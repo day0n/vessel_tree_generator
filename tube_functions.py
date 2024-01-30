@@ -73,6 +73,20 @@ def RCA_vessel_curve(sample_size, mean_ctrl_pts, stdev_ctrl_pts, length, rng, is
     shear: bool: apply shearing augmentation
     warp: bool: apply sin/cos based warping of point
     '''
+    pass
+
+def RCA_vessel_curve(sample_size, mean_ctrl_pts, stdev_ctrl_pts, length, rng, is_main=True, shear=False, warp=False):
+    '''
+    sample size: number of centerline points to interpolate
+    mean_ctrl_pts: mean vessel control points to sample from
+    stdev_ctrl_pts: standard deviation of mean vessel control points to sample from
+    Typically 10-15 control points gives reasonable results
+    length: desired length in [mm] of curve
+    rng: numpy random generator instance
+    is_main: determines if current vessel is the main branch or not
+    shear: bool: apply shearing augmentation
+    warp: bool: apply sin/cos based warping of point
+    '''
 
     #random_ctrl_points = rng.normal(mean_ctrl_pts, stdev_ctrl_pts).reshape(-1,3) #if using for machine learning, avoid using gaussian sampling
     random_ctrl_points = rng.uniform(mean_ctrl_pts - 1.5*stdev_ctrl_pts, mean_ctrl_pts+stdev_ctrl_pts+1.5*stdev_ctrl_pts)
