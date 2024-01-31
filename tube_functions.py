@@ -343,7 +343,7 @@ def branched_tree_generator(parent_curve, curve_derivative, num_branches, sample
     num_branches (int): number of branches to add to parent curve; if 0, returns single vessel
     sample_size: number of points in parent curve (branches will have same number of interpolated centerline points)
     side_branch_properties: dict containing name, length in [m], max radius, min radius, and parametric position of each branch
-    curve_type (string): "spline" for spline_tube, "cylinder" for cylinder, "RCA" for RCA
+    curve_type (string): "spline" for spline_tube, "cylinder" for cylinder, "RCA" for RCA ,"LAD" for LAD
     '''
     if curve_type not in ["spline", "cylinder", "RCA"]:
         ValueError("Unknown curve_type. Possible types are \"spline\", \"cylinder\", or \"RCA\"")
