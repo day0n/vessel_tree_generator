@@ -104,12 +104,13 @@ if __name__ == "__main__":
         elif args.vessel_type == 'spline':
             main_C, main_dC = random_spline(length, order, np.random.randint(order + 1, 10), sample_size)
         elif args.vessel_type == 'LAD':
-            LAD_control_points = np.load(os.path.join(args.control_point_path, "LAD_ctrl_points.npy")) / 1000 # [m] instead of [mm]
-            mean_ctrl_pts = np.mean(RCA_control_points, axis=0)
-            stdev_ctrl_pts = np.std(RCA_control_points, axis=0)
-            main_C, main_dC = RCA_vessel_curve(sample_size, mean_ctrl_pts, stdev_ctrl_pts, length, rng, shear=args.shear, warp=args.warp)
+            #下面的RAC_control_points也需要修改
+            RCA_control_points = np.load(os.path.join(args.control_point_path, "LAD_ctrl_points.npy")) / 1000 # [m] instead of [mm]
+            mean_ctrl_pts = RCA_control_points.copy()
 
-        else:
+            main_C, main_dC = LAD_vessel_curve(sample_size, mean_ctrl_pts, length, rng, shear=args.shear, warp=args.warp)
+
+        elif args.vessel_type == 'RCA':
             RCA_control_points = np.load(os.path.join(args.control_point_path, "RCA_ctrl_points.npy")) / 1000 # [m] instead of [mm]
             mean_ctrl_pts = np.mean(RCA_control_points, axis=0)
             stdev_ctrl_pts = np.std(RCA_control_points, axis=0)

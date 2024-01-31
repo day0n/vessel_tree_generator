@@ -386,7 +386,19 @@ def branched_tree_generator(parent_curve, curve_derivative, num_branches, sample
             rotated_C = rotate_branch(recentered_C, theta, phi).tolist()
             branch_C = np.array(rotated_C)
             dC = np.subtract(np.array(rotated_C[1:]), np.array(rotated_C[:-1]))
-        else:
+        elif curve_type == "LAD":
+            # can adjust rotations if branches are crossing/overlapping etc.
+            rotations = np.array([[-10+random.randint(0,5)*(-1)**random.getrandbits(1),0], [0, 15+random.randint(0,5)*(-1)**random.getrandbits(1)], [-10+random.randint(0,5)*(-1)**random.getrandbits(1),10]])
+            rng = np.random.default_rng()
+            control_points = np.load(os.path.join('RCA_branch_control_points/moderate', "{}_ctrl_points.npy".format(side_branch_properties[i+1]["name"]))) / 1000
+            mean_ctrl_pts = np.mean(control_points, axis=0)
+            stdev_ctrl_pts = np.std(control_points, axis=0)
+
+            branch, dC = LAD_vessel_curve(sample_size, mean_ctrl_pts, branch_length, rng, shear=True, warp=True)
+            branch_C = branch - branch[0, :] + parent_curve[pos,:]
+            theta, phi = rotations[i]
+            branch_C = rotate_branch(branch_C, theta, phi, center_rotation=False)
+        elif curve_type == "RCA":
             # can adjust rotations if branches are crossing/overlapping etc.
             rotations = np.array([[-10+random.randint(0,5)*(-1)**random.getrandbits(1),0], [0, 15+random.randint(0,5)*(-1)**random.getrandbits(1)], [-10+random.randint(0,5)*(-1)**random.getrandbits(1),10]])
             rng = np.random.default_rng()
