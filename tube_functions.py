@@ -387,7 +387,12 @@ def branched_tree_generator(parent_curve, curve_derivative, num_branches, sample
             branch_C = np.array(rotated_C)
             dC = np.subtract(np.array(rotated_C[1:]), np.array(rotated_C[:-1]))
         elif curve_type == "LAD":
-            # can adjust rotations if branches are crossing/overlapping etc.
+            #根据LAD的特征让每一个分支位置向下调
+            if pos + 35 < len(parent_curve):
+                pos = pos + 35
+            else:
+                if pos + 20 <len(parent_curve):
+                    pos + 20
             rotations = np.array([[-10+random.randint(0,5)*(-1)**random.getrandbits(1),0], [0, 15+random.randint(0,5)*(-1)**random.getrandbits(1)], [-10+random.randint(0,5)*(-1)**random.getrandbits(1),10]])
             rng = np.random.default_rng()
             control_points = np.load(os.path.join('RCA_branch_control_points/moderate', "{}_ctrl_points.npy".format(side_branch_properties[i+1]["name"]))) / 1000

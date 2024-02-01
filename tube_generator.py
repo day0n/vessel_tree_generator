@@ -76,6 +76,13 @@ side_branch_properties = {
     3: {"name": "PDA", "length": 0.055, "min_radius": 0.001, "max_radius": 0.0012, "parametric_position": [0.55, 0.65]}
 }
 
+# 这些值对应于LAD树的分支，可以为其他树修改
+side_branch_properties = {
+    1: {"name": "SA", "length": 0.035, "min_radius": 0.0009, "max_radius": 0.0011, "parametric_position": [0.23, 0.34]},
+    2: {"name": "AM", "length": 0.0506, "min_radius": 0.001, "max_radius": 0.0012, "parametric_position": [0.35, 0.46]},
+    3: {"name": "PDA", "length": 0.055, "min_radius": 0.001, "max_radius": 0.0012, "parametric_position": [0.43, 0.55]},
+}
+
 vessel_dict = {'num_stenoses': None, 'stenosis_severity': [], 'stenosis_position': [],
            'num_stenosis_points': [], 'max_radius': None, 'min_radius': None, 'branch_point': None}
 
@@ -104,9 +111,8 @@ if __name__ == "__main__":
         elif args.vessel_type == 'spline':
             main_C, main_dC = random_spline(length, order, np.random.randint(order + 1, 10), sample_size)
         elif args.vessel_type == 'LAD':
-            #下面的RAC_control_points也需要修改
-            RCA_control_points = np.load(os.path.join(args.control_point_path, "LAD_ctrl_points.npy")) / 1000 # [m] instead of [mm]
-            mean_ctrl_pts = RCA_control_points.copy()
+            LAD_control_points = np.load(os.path.join(args.control_point_path, "LAD_ctrl_points.npy")) / 1000 # [m] instead of [mm]
+            mean_ctrl_pts = LAD_control_points.copy()
 
             main_C, main_dC = LAD_vessel_curve(sample_size, mean_ctrl_pts, length, rng, shear=args.shear, warp=args.warp)
 
