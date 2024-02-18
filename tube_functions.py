@@ -76,10 +76,7 @@ def LCX_vessel_curve(sample_size, mean_ctrl_pts,  length, rng,  shear=False, war
     #对主干进行随机生成
     random_ctrl_points = mean_ctrl_pts + np.random.uniform(-0.0045, 0.0045, size=mean_ctrl_pts.shape)
     new_ctrl_points = random_ctrl_points.copy()
-    shear = False
     if shear:
-        print(shear)
-        print('shear')
         new_ctrl_points = shear_centerlines(new_ctrl_points, 0.12)
     if warp:
         new_ctrl_points = warp1(new_ctrl_points, 0.1)
