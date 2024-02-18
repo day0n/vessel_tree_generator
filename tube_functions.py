@@ -61,6 +61,47 @@ def random_spline(length, degree, num_control_points, sample_size):
 
     return C, dC
 
+def LCX_vessel_curve(sample_size, mean_ctrl_pts,  length, rng,  shear=False, warp=False):
+    '''
+    sample size: number of centerline points to interpolate要插值的中心线点数
+    mean_ctrl_pts: mean vessel control points to sample from取样的平均血管控制点
+    stdev_ctrl_pts: standard deviation of mean vessel control points to sample from
+    Typically 10-15 control points gives reasonable results样品的平均血管控制点的标准偏差通常情况下，10-15个控制点会给出合理的结果
+    length: desired length in [mm] of curve所需的曲线长度[mm]
+    rng: numpy random generator instancenumpy随机生成器实例
+    is_main: determines if current vessel is the main branch or not确定当前血管是否为主分支
+    shear: bool: apply shearing augmentation应用剪切增强
+    warp: bool: apply sin/cos based warping of point应用基于sin/cos的点翘曲
+    '''
+    #对主干进行随机生成
+    random_ctrl_points = mean_ctrl_pts + np.random.uniform(-0.0045, 0.0045, size=mean_ctrl_pts.shape)
+    new_ctrl_points = random_ctrl_points.copy()
+    shear = False
+    if shear:
+        print(shear)
+        print('shear')
+        new_ctrl_points = shear_centerlines(new_ctrl_points, 0.12)
+    if warp:
+        new_ctrl_points = warp1(new_ctrl_points, 0.1)
+
+    curve = BSpline.Curve()
+    curve.degree = 3
+    curve.ctrlpts = new_ctrl_points.tolist()
+    # generates uniform knot vector
+    curve.knotvector = utilities.generate_knot_vector(curve.degree, len(curve.ctrlpts))
+    curve.delta = 0.01
+    curve.sample_size = sample_size
+    scaling = length/operations.length_curve(curve)
+    curve = operations.scale(curve, scaling)
+
+    C = np.array(curve.evalpts)
+
+    ct1 = operations.tangent(curve, np.linspace(0, 1, curve.sample_size).tolist(), normalize=True)
+    curvetan = np.array(list((ct1)))  # ((x,y,z) (u,v,w)) format
+    dC = curvetan[:, 1, :3]
+
+    return C, dC
+
 def LAD_vessel_curve(sample_size, mean_ctrl_pts,  length, rng,  shear=False, warp=False):
     '''
     sample size: number of centerline points to interpolate要插值的中心线点数
@@ -343,7 +384,7 @@ def branched_tree_generator(parent_curve, curve_derivative, num_branches, sample
     num_branches (int): number of branches to add to parent curve; if 0, returns single vessel
     sample_size: number of points in parent curve (branches will have same number of interpolated centerline points)
     side_branch_properties: dict containing name, length in [m], max radius, min radius, and parametric position of each branch
-    curve_type (string): "spline" for spline_tube, "cylinder" for cylinder, "RCA" for RCA ,"LAD" for LAD
+    curve_type (string): "spline" for spline_tube, "cylinder" for cylinder, "RCA" for RCA ,"LAD" for LAD , "LCX" for LCX
     '''
     if curve_type not in ["spline", "cylinder", "RCA"]:
         ValueError("Unknown curve_type. Possible types are \"spline\", \"cylinder\", or \"RCA\"")
@@ -393,6 +434,18 @@ def branched_tree_generator(parent_curve, curve_derivative, num_branches, sample
             else:
                 if pos + 20 <len(parent_curve):
                     pos + 20
+            rotations = np.array([[-10+random.randint(0,5)*(-1)**random.getrandbits(1),0], [0, 15+random.randint(0,5)*(-1)**random.getrandbits(1)], [-10+random.randint(0,5)*(-1)**random.getrandbits(1),10]])
+            rng = np.random.default_rng()
+            control_points = np.load(os.path.join('RCA_branch_control_points/moderate', "{}_ctrl_points.npy".format(side_branch_properties[i+1]["name"]))) / 1000
+            mean_ctrl_pts = np.mean(control_points, axis=0)
+            stdev_ctrl_pts = np.std(control_points, axis=0)
+
+            branch, dC = LAD_vessel_curve(sample_size, mean_ctrl_pts, branch_length, rng, shear=True, warp=True)
+            branch_C = branch - branch[0, :] + parent_curve[pos,:]
+            theta, phi = rotations[i]
+            branch_C = rotate_branch(branch_C, theta, phi, center_rotation=False)
+        elif curve_type == "LCX":
+
             rotations = np.array([[-10+random.randint(0,5)*(-1)**random.getrandbits(1),0], [0, 15+random.randint(0,5)*(-1)**random.getrandbits(1)], [-10+random.randint(0,5)*(-1)**random.getrandbits(1),10]])
             rng = np.random.default_rng()
             control_points = np.load(os.path.join('RCA_branch_control_points/moderate', "{}_ctrl_points.npy".format(side_branch_properties[i+1]["name"]))) / 1000
