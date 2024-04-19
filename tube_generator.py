@@ -9,6 +9,7 @@ import json
 import copy
 import argparse
 
+count_vessel = 0
 # general: required arguments
 parser = argparse.ArgumentParser('3D vessel tree generator')
 parser.add_argument('--save_path', default=None, type=str, required=True)

@@ -3,6 +3,7 @@ import numpy as np
 from fwd_projection_functions import *
 import random
 from augmentation import shear_centerlines, warp1
+import tube_generator
 
 # we use the random library instead of numpy.random for most functions due to
 # issues with numpy generating identical random numbers when using multiprocessing
@@ -370,7 +371,22 @@ def get_vessel_surface(curve, derivatives, branch_points, num_centerline_points,
     X = np.squeeze(surface[:,:,0])
     Y = np.squeeze(surface[:,:,1])
     Z = np.squeeze(surface[:,:,2])
+    
+    print(tube_generator.count_vessel)
+    tube_generator.count_vessel += 1
+    #画出点xyz
+    for i in range(len(X)):
+        plt.plot(X[i],Y[i])
+    plt.show()
 
+
+    #保存xyz，new_r，保存到一个四维的npy文件，前三维是xyz是坐标。第四维是每个点对应的半径
+    centerline_and_radius = np.hstack((C, new_r.reshape(-1, 1)))
+    np.save('/Users/mrniu/Desktop/centerline_and_radius_{}.npy'.format(tube_generator.count_vessel), centerline_and_radius)
+
+    # 保存表面点云到npy文件
+    surface_points = np.vstack(surface)
+    np.save('/Users/mrniu/Desktop/surface_points_{}.npy'.format(tube_generator.count_vessel), surface_points)
     return X, Y, Z, new_r, percent_stenosis, stenosis_pos, num_stenosis_points
 
 def branched_tree_generator(parent_curve, curve_derivative, num_branches, sample_size, side_branch_properties, curve_type="spline"):
@@ -469,4 +485,6 @@ def branched_tree_generator(parent_curve, curve_derivative, num_branches, sample
         centerlines.append(branch_C)
         derivatives.append(dC)
         connections.append(pos)
+
+    
     return centerlines, derivatives, connections
