@@ -1,4 +1,4 @@
-#这段代码用于生成处理泊松重建生成的模型，将模型中的一部分删除
+#用于生成处理泊松重建生成的模型，将模型中的一部分删除
 import numpy as np
 import open3d as o3d
 from scipy.spatial import KDTree

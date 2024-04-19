@@ -52,9 +52,9 @@ branch_surface_outside = np.array(branch_surface_outside)
 np.save('/Users/mrniu/Desktop/vessel_data/branch_surface_inside{}.npy'.format(file_number),branch_surface_inside)
 
 
-#画出npy文件
+
 import open3d as o3d
-# 创建PointCloud对象
+
 pcd_inside = o3d.geometry.PointCloud()
 pcd_inside.points = o3d.utility.Vector3dVector(branch_surface_inside)
 
@@ -65,5 +65,5 @@ pcd_inside.points = o3d.utility.Vector3dVector(branch_surface_inside)
 # pcd_branch.points = o3d.utility.Vector3dVector(branch_surface_outside)
 
 
-# 显示点云
+
 o3d.visualization.draw_geometries([pcd_inside])
